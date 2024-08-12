@@ -104,5 +104,5 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
         st.switch_page("pages/5포트폴리오 상관관계 분석.py")
 
 else:
-    st.title("Stock's correlation")
-    st.write("No stocks in the portfolio.")
+    st.title("포트폴리오 상관관계 분석")
+    st.write("포트폴리오에 주식이 없습니다.")
