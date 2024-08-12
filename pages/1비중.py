@@ -17,20 +17,20 @@ def get_usd_to_krw_exchange_rate():
     ticker = 'KRW=X'
     data = yf.Ticker(ticker).history(period="1d")
     latest_data = data.iloc[-1]
-    return latest_data['Close']
+    return round(latest_data['Close'],2)
 
 def format_value(value):
     if isinstance(value, (int, float)):
         if value >= 1e12:
-            return f"{value / 1e12:.2f} 조"  # 조 단위
+            return f"{value / 1e12:.2f}조"  # 조 단위
         elif value >= 1e9:
-            return f"{value / 1e9:.2f} 억"  # 십억 단위
+            return f"{value / 1e9:.2f}억"  # 십억 단위
         elif value >= 1e6:
-            return f"{value / 1e6:.2f} 백만"  # 백만 단위
+            return f"{value / 1e6:.2f}백만"  # 백만 단위
         elif value >= 1e3:
-            return f"{value / 1e3:.2f} 천"  # 천 단위
+            return f"{value / 1e3:.2f}천"  # 천 단위
         else:
-            return f"{value:.2f}"
+            return f"{value:.2f}원"
     else:
         return "N/A"
 

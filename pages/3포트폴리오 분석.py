@@ -5,19 +5,57 @@ import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
 
+# 환율 데이터
 @st.cache_data
-def stock_df(labels):
+def get_krw_usd():
+    ticker = 'KRW=X'
+    data = yf.Ticker(ticker).history(period="1d")
+    latest_data = data.iloc[-1]
+    return latest_data['Close']
+@st.cache_data
+def stock_df(labels, KRW):
     data_frames = []
+    all_dates = set()
 
     for symbol in labels:
-        ticker = yf.Ticker(symbol)
-        stock_data = ticker.history(interval='1d', period='max')
-        stock_data.columns = [f"{symbol}_{col}" for col in stock_data.columns]
-        data_frames.append(stock_data)
+        try:
+            ticker = yf.Ticker(symbol)
+            stock_data = ticker.history(interval='1d', period='max')
+            stock_data.index = pd.to_datetime(stock_data.index.strftime('%Y-%m-%d'))
 
-    combined_data = pd.concat(data_frames, axis=1)
-    row_mask = combined_data.notna().all(axis=1)
-    result_df = combined_data[row_mask]
+            if stock_data.empty:
+                print(f"No data for {symbol}")
+                continue
+
+            # 열 이름을 심볼과 연결하여 중복되지 않도록 함
+            stock_data.columns = [f"{symbol}_{col}" for col in stock_data.columns]
+
+            # 미국 주식에 대해 환율 변환 적용
+            if not symbol.endswith(('.KS', '.KQ')):
+                stock_data = stock_data * KRW
+
+            # 모든 날짜를 수집
+            all_dates.update(stock_data.index)
+
+            # 데이터 프레임을 리스트에 추가
+            data_frames.append(stock_data)
+        except Exception as e:
+            print(f"Error fetching data for {symbol}: {e}")
+
+    if not data_frames:
+        raise ValueError("No data frames were created. Check the symbols and internet connection.")
+
+    # 모든 날짜를 인덱스로 사용하여 빈 데이터 프레임 생성
+    all_dates = sorted(all_dates)  # 날짜를 정렬
+    combined_data = pd.DataFrame(index=all_dates)
+
+    # 모든 데이터 프레임을 날짜 기준으로 합침
+    for df in data_frames:
+        combined_data = combined_data.join(df, how='outer')
+
+    # 결측값 없는 행만 추출
+    result_df = combined_data.dropna()
+
     return result_df
 @st.cache_data
 def total_return(dataframe, labels):
@@ -67,19 +105,20 @@ def yoy_return_hist(dataframe, labels):
   return fig
 
 if "stock_list" in st.session_state and st.session_state.stock_list:
+    st.title('포트폴리오 분석')
     # 원본 데이터
     labels = [stock['stock_name'] for stock in st.session_state.stock_list]
-    df = stock_df(labels)
+    df = stock_df(labels, get_krw_usd())
 
     # 성장률 비교
     total_df, log_total_df = total_return(df, labels)
-    st.subheader('Growth rate')
+    st.subheader('성장률(100기준)')
     fig_line = px.line(log_total_df, x=log_total_df.index, y=labels)
     st.plotly_chart(fig_line)
 
     # 연간 수익률, 변동성 비교
     annual_ret, annual_volatility = yoy_return_risk(total_df)
-    st.subheader('Yearly Return & Risk')
+    st.subheader('연간 수익 & 리스크')
     # 개별 수익, 변동성
     fig_scatter = px.scatter(x=annual_volatility, y=annual_ret, text=labels, labels={'x': 'Risk', 'y': 'Return'},
                              color_discrete_sequence=['blue'])
@@ -91,10 +130,13 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
     st.plotly_chart(fig_scatter)
 
     # 일간 변동성 히스토그램
-    st.subheader('Yearly Return Histogram')
+    st.subheader('연간 수익률 히스토그램')
     fig_hist = yoy_return_hist(total_df, labels)
     st.plotly_chart(fig_hist)
 
+    if st.button("다음"):
+        st.switch_page("pages/4포트폴리오 평가.py")
+
 else:
-    st.title('Portfolio')
-    st.write("No stocks in the portfolio.")
+    st.title('포트폴리오')
+    st.write("포트폴리오에 주식이 없습니다.")
