@@ -13,6 +13,7 @@ with st.expander("도움말"):
     st.write('''
         1. 한국 상장 주식 경우 빨간색 체크표시의 티커이름을 확인해주세요. \n
         2. 코스피 상장인 경우 티커번호.KS, 코스닥 상장인 경우 티커번호.KQ을 입력해주세요
+        3. ex) TIGER 미국나스닥100 -> 133690.KS
     ''')
 
 # 증권사 모음
@@ -49,6 +50,8 @@ with st.form(key="form"):
     if add:
         valid_input = True
 
+        stock_name = stock_name.upper()
+
         try:
             quote_type = yf.Ticker(stock_name).info['quoteType']
             if quote_type not in ['EQUITY', 'ETF']:
@@ -60,12 +63,13 @@ with st.form(key="form"):
             valid_input = False
 
         try:
-            if ('.KS' in stock_name or '.KQ' in stock_name) and price_unit != 'WON(₩)':
+            if (stock_name.endswith('.KS') or stock_name.endswith('.KQ')) and price_unit != 'WON(₩)':
                 st.error("한국 주식의 화폐단위는 WON(₩)이어야 합니다.")
                 valid_input = False
             elif ('.KS' not in stock_name and '.KQ' not in stock_name) and price_unit != 'USD($)':
                 st.error("외국 주식의 화폐단위는 USD($)이어야 합니다.")
                 valid_input = False
+
         except ValueError:
             st.error("화폐 단위 확인해주세요.")
             valid_input = False

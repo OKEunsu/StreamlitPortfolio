@@ -101,7 +101,7 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
     st.plotly_chart(fig_return)
 
     if st.button("다음"):
-        st.switch_page("pages/5포트폴리오 상관관계 분석.py")
+        st.switch_page("pages/6피드백.py")
 
 else:
     st.title("포트폴리오 상관관계 분석")
