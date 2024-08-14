@@ -11,7 +11,7 @@ def format_value(value):
         elif value >= 1e9:
             return f"{value / 1e9:.2f}억"  # 십억 단위
         elif value >= 1e6:
-            return f"{value / 1e6:.2f}백만"  # 백만 단위
+            return f"{value / 1e6:.1f}백만"  # 백만 단위
         elif value >= 1e3:
             return f"{value / 1e3:.2f}천"  # 천 단위
         else:
