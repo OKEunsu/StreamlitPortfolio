@@ -154,13 +154,20 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
         short_name = get_ticker_short_name(stock['stock_name'])
         labels_name.append(short_name)
         labels.append(stock['stock_name'])
-        st.write(f"{i + 1}. 티커: {short_name}, 보유수: {stock['stock_num']}, 평단가: {stock['stock_price']} {stock['currency_unit']}")
+        st.write(f"{i + 1}. 티커: {short_name}, 보유수: {stock['stock_num']}, 현재가 : {stock['stock_current']}, 평단가: {stock['stock_price']}, 화폐: {stock['currency_unit']}")
 
     usd_to_krw = get_usd_to_krw_exchange_rate()
     # 파이차트를 위한 데이터 준비
     values = []
     for stock in st.session_state.stock_list:
-        total_value = stock['stock_num'] * stock['stock_price']
+        try:
+            stock_num = float(stock['stock_num'])  # 보유수
+            stock_current = float(stock['stock_current'])  # 현재가
+        except ValueError:
+            st.error(f"유효하지 않은 데이터 형식: {stock}")
+            continue
+
+        total_value = stock_num * stock_current
         if stock['currency_unit'] == 'USD($)':
             total_value *= usd_to_krw  # Convert USD to KRW
         values.append(total_value)
@@ -177,3 +184,4 @@ else:
 
 if st.button("다음"):
     st.switch_page("pages/2개별 분석.py")
+
