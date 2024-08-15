@@ -112,4 +112,3 @@ for i, stock in enumerate(st.session_state.stock_list):
 
 if st.button("완료"):
     st.switch_page("pages/1비중.py")
-

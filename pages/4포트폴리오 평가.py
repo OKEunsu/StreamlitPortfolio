@@ -4,6 +4,12 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
+def get_ticker_short_name(ticker_symbol):
+    ticker = yf.Ticker(ticker_symbol)
+    info = ticker.info
+    short_name = info.get('shortName', 'N/A')  # 'shortName' 키가 없을 경우 'N/A'로 반환
+    return short_name
+
 def format_value(value):
     if isinstance(value, (int, float)):
         if value >= 1e12:
@@ -11,7 +17,7 @@ def format_value(value):
         elif value >= 1e9:
             return f"{value / 1e9:.2f}억"  # 십억 단위
         elif value >= 1e6:
-            return f"{value / 1e6:.1f}백만"  # 백만 단위
+            return f"{value / 1e6:.2f}백만"  # 백만 단위
         elif value >= 1e3:
             return f"{value / 1e3:.2f}천"  # 천 단위
         else:
@@ -235,6 +241,16 @@ def mdd_stock(dataframe):
 if "stock_list" in st.session_state and st.session_state.stock_list:
     st.title('포트폴리오 평가(샤프지수)')
     labels = [stock['stock_name'] for stock in st.session_state.stock_list]
+    short_names = [get_ticker_short_name(ticker) for ticker in labels]
+
+    # 데이터프레임 생성
+    label_df = pd.DataFrame({
+        'Ticker Symbol': labels,
+        'Short Name': short_names
+    })
+    st.subheader('주식 목록')
+    st.dataframe(label_df, hide_index=True)
+
     stock_mean_price = [stock['stock_price'] for stock in st.session_state.stock_list]
     qtys = [stock['stock_num'] for stock in st.session_state.stock_list]
     krw_usd_rate = get_krw_usd()
@@ -244,7 +260,7 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
     st.subheader('Sharp Portfolio')
     st.plotly_chart(fig)
 
-    st.subheader('수익률 분석')
+    st.subheader('수익률 분석(Simualtion은 동일 비율)')
     money = 10000000 # 백만
 
     # 포트폴리오 데이터프레임 생성

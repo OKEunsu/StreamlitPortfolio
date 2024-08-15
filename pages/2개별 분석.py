@@ -12,7 +12,6 @@ def get_ticker_short_name(ticker_symbol):
     short_name = info.get('shortName', 'N/A')  # 'shortName' 키가 없을 경우 'N/A'로 반환
     return short_name
 
-
 # 단위 변환
 def format_usd(value):
     if isinstance(value, (int, float)):
@@ -28,7 +27,6 @@ def format_usd(value):
             return f"$ {value:.1f}"
     else:
         return "N/A"
-
 
 def format_won(value):
     if isinstance(value, (int, float)):
@@ -199,7 +197,7 @@ def ohlc_plot(data, label, price):
         x=data.index,  # X-axis values are taken from the index of the dataframe
         y=data[f'{label}_Close'],  # Y-axis values are the close price
         mode='lines',  # Plot as a line
-        name=f'{label} 종가'  # Legend label
+        name=f'{get_ticker_short_name(label)}'  # Legend label
     ))
 
     # Add a horizontal line trace for the specified price
@@ -211,12 +209,19 @@ def ohlc_plot(data, label, price):
         name=f'평단가'
     ))
 
-    # Update the layout with a title
+    # Update the layout with a title and legend position
     fig.update_layout(
-        title=f"{label} - CAGR: {cagr:.2%}",
+        title=f"CAGR: {cagr:.2%}",
         xaxis_title="Date",
         yaxis_title="Price",
-        xaxis_rangeslider_visible=False
+        xaxis_rangeslider_visible=False,
+        legend=dict(
+            orientation='h',  # Horizontal orientation
+            yanchor='bottom',  # Anchor the y position at the bottom of the legend
+            y=1.1,  # Position the legend slightly above the plot
+            xanchor='center',  # Center the x position
+            x=0.5  # Center the legend horizontally
+        )
     )
 
     return fig
