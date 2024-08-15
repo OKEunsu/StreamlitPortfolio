@@ -122,10 +122,16 @@ def sharp_ratio(data, stocks, having_qty, stock_prices, krw_usd_rate):
     # 환율을 사용하여 가격 변환
     stock_prices_krw = []
     for price, symbol in zip(stock_prices, stocks):
-        if symbol.endswith(('.KS', '.KQ')):
-            stock_prices_krw.append(price)
-        else:
-            stock_prices_krw.append(price * krw_usd_rate)
+        try:
+            # price가 숫자인지 확인하고 변환
+            price = float(price)
+            if symbol.endswith(('.KS', '.KQ')):
+                stock_prices_krw.append(price)
+            else:
+                stock_prices_krw.append(price * krw_usd_rate)
+        except ValueError:
+            st.error(f"잘못된 가격 값: {price} 심볼: {symbol}")
+            return None  # 오류를 적절히 처리
 
     # 각 주식의 현재 가치 계산
     current_values = [qty * price for qty, price in zip(having_qty, stock_prices_krw)]
@@ -155,8 +161,7 @@ def sharp_ratio(data, stocks, having_qty, stock_prices, krw_usd_rate):
     st.write("Min Risk")
     st.dataframe(round(min_risk, 4), use_container_width=True, hide_index=True)
 
-    # minimum-variance portfolio와 mean-variance portfolio 시각화
-    # plotly로 그래프 그리기
+    # 최소-변동성과 평균-변동성 포트폴리오 시각화
     fig = go.Figure()
 
     # 모든 포트폴리오를 산점도로 추가
@@ -186,7 +191,6 @@ def sharp_ratio(data, stocks, having_qty, stock_prices, krw_usd_rate):
                       yaxis_title='Expected Returns',
                       width=900, height=600)
 
-    # plotly 그림 출력
     return fig
 
 def make_df(stock_df, ratio, labels, money):
@@ -252,11 +256,12 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
     st.dataframe(label_df, hide_index=True)
 
     stock_mean_price = [stock['stock_price'] for stock in st.session_state.stock_list]
+    stock_current_price = [stock['stock_current'] for stock in st.session_state.stock_list]
     qtys = [stock['stock_num'] for stock in st.session_state.stock_list]
     krw_usd_rate = get_krw_usd()
     df = stock_df(labels, krw_usd_rate)
 
-    fig = sharp_ratio(df, labels, qtys, stock_mean_price, krw_usd_rate)
+    fig = sharp_ratio(df, labels, qtys, stock_current_price, krw_usd_rate)
     st.subheader('Sharp Portfolio')
     st.plotly_chart(fig)
 
