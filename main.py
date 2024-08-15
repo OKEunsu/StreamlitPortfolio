@@ -38,10 +38,12 @@ with st.form(key="form"):
             ("USD($)", "원(₩)")
         )
 
-    col3, col4 = st.columns(2)
+    col3, col4, col5 = st.columns(3)
     with col3:
         stock_num = st.text_input(label="보유수")
     with col4:
+        stock_current = st.text_input(label="현재가")
+    with col5:
         stock_price = st.text_input(label="평단가")
 
     add = st.form_submit_button(label="추가")
@@ -82,6 +84,12 @@ with st.form(key="form"):
             valid_input = False
 
         try:
+            stock_price = float(stock_current)
+        except ValueError:
+            st.error("현재가는 숫자여야 합니다.")
+            valid_input = False
+
+        try:
             stock_price = float(stock_price)
         except ValueError:
             st.error("평단가는 숫자여야 합니다.")
@@ -91,6 +99,7 @@ with st.form(key="form"):
             st.session_state.stock_list.append({
                 "stock_name": stock_name,
                 "stock_num": stock_num,
+                "stock_current" : stock_current,
                 "stock_price": stock_price,
                 "currency_unit": price_unit
             })
@@ -103,7 +112,7 @@ for i, stock in enumerate(st.session_state.stock_list):
     col1, col2 = st.columns([4, 1])
     with col1:
         st.write(
-            f"{i + 1}. 티커: {stock['stock_name']}, 보유수: {stock['stock_num']}, 평단가: {stock['stock_price']} {stock['currency_unit']}")
+            f"{i + 1}. 티커: {stock['stock_name']}, 보유수: {stock['stock_num']}, 현재가: {stock['stock_current']} ,평단가: {stock['stock_price']}, {stock['currency_unit']}")
     with col2:
         delete_button = st.button(f"삭제 {i + 1}", key=f"delete_{i}")
         if delete_button:
