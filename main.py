@@ -35,7 +35,7 @@ with st.form(key="form"):
     with col2:
         price_unit = st.selectbox(
             "화폐단위",
-            ("USD($)", "WON(₩)")
+            ("USD($)", "원(₩)")
         )
 
     col3, col4 = st.columns(2)
@@ -63,8 +63,8 @@ with st.form(key="form"):
             valid_input = False
 
         try:
-            if (stock_name.endswith('.KS') or stock_name.endswith('.KQ')) and price_unit != 'WON(₩)':
-                st.error("한국 주식의 화폐단위는 WON(₩)이어야 합니다.")
+            if (stock_name.endswith('.KS') or stock_name.endswith('.KQ')) and price_unit != '원(₩)':
+                st.error("한국 주식의 화폐단위는 원(₩)이어야 합니다.")
                 valid_input = False
             elif ('.KS' not in stock_name and '.KQ' not in stock_name) and price_unit != 'USD($)':
                 st.error("외국 주식의 화폐단위는 USD($)이어야 합니다.")
