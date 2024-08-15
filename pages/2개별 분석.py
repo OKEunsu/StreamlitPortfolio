@@ -4,6 +4,13 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
+# 티커 이름 변환
+def get_ticker_short_name(ticker_symbol):
+    ticker = yf.Ticker(ticker_symbol)
+    info = ticker.info
+    short_name = info.get('shortName', 'N/A')  # 'shortName' 키가 없을 경우 'N/A'로 반환
+    return short_name
+    
 # 단위 변환
 def format_usd(value):
     if isinstance(value, (int, float)):
@@ -239,6 +246,8 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
     tabs = st.tabs(labels)
     for i, tab in enumerate(tabs):
         with tab:
+            stock_name_ticker = get_ticker_short_name(lables[i])
+            st.subheader(stock_name_ticker)
             df = stock_df(labels[i])
 
             # 각 탭에서 Plotly 그래프 그리기
