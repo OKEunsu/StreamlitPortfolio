@@ -4,13 +4,15 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
+
 # 티커 이름 변환
 def get_ticker_short_name(ticker_symbol):
     ticker = yf.Ticker(ticker_symbol)
     info = ticker.info
     short_name = info.get('shortName', 'N/A')  # 'shortName' 키가 없을 경우 'N/A'로 반환
     return short_name
-    
+
+
 # 단위 변환
 def format_usd(value):
     if isinstance(value, (int, float)):
@@ -26,6 +28,8 @@ def format_usd(value):
             return f"$ {value:.1f}"
     else:
         return "N/A"
+
+
 def format_won(value):
     if isinstance(value, (int, float)):
         if value >= 1e12:
@@ -40,6 +44,7 @@ def format_won(value):
             return f"{value:.1f}원"
     else:
         return "N/A"
+
 
 # 주식 지표
 def get_financial_metrics(ticker_symbol):
@@ -79,6 +84,8 @@ def get_financial_metrics(ticker_symbol):
         'ROA': f"{roa:.2f}",
         'type': dtype
     }
+
+
 # 재무제표
 def get_fundamental_data(ticker_symbol):
     ticker = yf.Ticker(ticker_symbol)
@@ -121,17 +128,21 @@ def get_fundamental_data(ticker_symbol):
         fig_eps = None
 
     return fig_fundamental, fig_eps
+
+
 # 부채비율,
 def get_ratio(ticker_symbol):
     ticker = yf.Ticker(ticker_symbol)
     balance_sheet = ticker.balance_sheet
-    ratio_columns = ['Total Equity Gross Minority Interest', 'Total Liabilities Net Minority Interest', 'Current Assets',
+    ratio_columns = ['Total Equity Gross Minority Interest', 'Total Liabilities Net Minority Interest',
+                     'Current Assets',
                      'Current Liabilities']
     if all(col in balance_sheet.index for col in ratio_columns):
         bs_df = balance_sheet.loc[['Total Equity Gross Minority Interest', 'Total Liabilities Net Minority Interest',
                                    'Current Assets', 'Current Liabilities'], :].dropna(axis=1).T[::-1]
 
-        bs_df['Debt Ratio'] = bs_df['Total Liabilities Net Minority Interest'] / bs_df['Total Equity Gross Minority Interest'] * 100
+        bs_df['Debt Ratio'] = bs_df['Total Liabilities Net Minority Interest'] / bs_df[
+            'Total Equity Gross Minority Interest'] * 100
         bs_df['Current Ratio'] = bs_df['Current Assets'] / bs_df['Current Liabilities'] * 100
 
         bs_df.reset_index(inplace=True)
@@ -139,8 +150,10 @@ def get_ratio(ticker_symbol):
         bs_df['Date'] = pd.to_datetime(bs_df['Date']).dt.strftime('%Y')
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=bs_df.Date, y=bs_df['Debt Ratio'], mode='lines+markers', name='Debt Ratio', text=bs_df['Debt Ratio']))
-        fig.add_trace(go.Scatter(x=bs_df.Date, y=bs_df['Current Ratio'], mode='lines+markers', name='Current Ratio', text=bs_df['Current Ratio']))
+        fig.add_trace(go.Scatter(x=bs_df.Date, y=bs_df['Debt Ratio'], mode='lines+markers', name='Debt Ratio',
+                                 text=bs_df['Debt Ratio']))
+        fig.add_trace(go.Scatter(x=bs_df.Date, y=bs_df['Current Ratio'], mode='lines+markers', name='Current Ratio',
+                                 text=bs_df['Current Ratio']))
         fig.update_layout(title='Debt Ratio and Current Ratio Over Years',
                           xaxis_title='Year', yaxis_title='Ratio',
                           xaxis=dict(tickmode='array', tickvals=bs_df['Date'], ticktext=bs_df['Date']))
@@ -148,6 +161,8 @@ def get_ratio(ticker_symbol):
         fig = None
 
     return fig
+
+
 # 애널리스트 추천
 def get_recommend(ticker_symbol):
     ticker = yf.Ticker(ticker_symbol)
@@ -162,12 +177,15 @@ def get_recommend(ticker_symbol):
     fig.update_layout(bargap=0.5, legend={'traceorder': 'reversed'})
     return fig
 
+
 @st.cache_data
 def stock_df(label):
     ticker = yf.Ticker(label)
     stock_data = ticker.history(interval='1d', period='max')
     stock_data.columns = [f"{label}_{col}" for col in stock_data.columns]
     return stock_data
+
+
 def ohlc_plot(data, label, price):
     # Calculate cumulative return and CAGR
     data = calculate_cumulative_return(data, label)
@@ -202,15 +220,21 @@ def ohlc_plot(data, label, price):
     )
 
     return fig
+
+
 def calculate_cumulative_return(data, label):
     data['Cumulative Return'] = (data[f'{label}_Close'] / data[f'{label}_Close'].iloc[0]) - 1
     return data
+
+
 def calculate_cagr(data, label):
     start_price = data[f'{label}_Close'].iloc[0]
     end_price = data[f'{label}_Close'].iloc[-1]
     n_years = (data.index[-1] - data.index[0]).days / 252  # Convert days to years
     cagr = (end_price / start_price) ** (1 / n_years) - 1
     return cagr
+
+
 @st.cache_data
 def mdd_stock(DataFrame, stock_name):
     window = 252
@@ -237,6 +261,7 @@ def mdd_stock(DataFrame, stock_name):
     fig = go.Figure(data=data, layout=layout)
     return fig
 
+
 st.title('개별 분석')
 if "stock_list" in st.session_state and st.session_state.stock_list:
 
@@ -246,7 +271,7 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
     tabs = st.tabs(labels)
     for i, tab in enumerate(tabs):
         with tab:
-            stock_name_ticker = get_ticker_short_name(lables[i])
+            stock_name_ticker = get_ticker_short_name(labels[i])
             st.subheader(stock_name_ticker)
             df = stock_df(labels[i])
 
@@ -348,10 +373,8 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
                 )
                 st.write('')
 
-
     if st.button("다음"):
         st.switch_page("pages/3포트폴리오 분석.py")
 
 else:
     st.write("포트폴리오에 주식이 없습니다.")
-
