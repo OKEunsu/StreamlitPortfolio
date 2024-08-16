@@ -156,6 +156,7 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
     )
     st.plotly_chart(fig_line)
 
+    st.subheader('연간 수익 & 리스크')
     # 연간 수익률, 변동성 비교
     annual_ret, annual_volatility = yoy_return_risk(total_df)
     
