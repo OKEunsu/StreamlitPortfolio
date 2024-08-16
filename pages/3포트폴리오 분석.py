@@ -158,20 +158,26 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
 
     # 연간 수익률, 변동성 비교
     annual_ret, annual_volatility = yoy_return_risk(total_df)
-    st.subheader('연간 수익 & 리스크')
-    fig_scatter = px.scatter(x=annual_volatility, y=annual_ret, text=rename_labels,
+    
+    # 데이터프레임 생성하여 plotly가 자동으로 색상 및 범례 처리
+    plot_df = pd.DataFrame({
+        'Risk': annual_volatility,
+        'Return': annual_ret,
+        'Label': rename_labels
+    })
+    
+    # Scatter plot 생성
+    fig_scatter = px.scatter(plot_df, x='Risk', y='Return', color='Label',
                              labels={'x': 'Risk', 'y': 'Return'},
-                             color_discrete_sequence=['blue'])
-    # 텍스트 색상과 스타일 업데이트
-    fig_scatter.update_traces(
-        marker=dict(size=40),
-        textfont=dict(color='white', size=14, weight='bold')
-    )
-    # 범례 제목 및 위치 업데이트
+                             color_discrete_sequence=px.colors.qualitative.Set1)
+    
+    # 마커 스타일 업데이트
+    fig_scatter.update_traces(marker=dict(size=15))
+    
+    # 범례 위치 및 제목 업데이트
     fig_scatter.update_layout(
         legend_title_text='Stocks',
         legend=dict(
-            title='Stocks',
             orientation='h',
             yanchor='bottom',
             y=1.1,
@@ -179,6 +185,8 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
             x=1
         )
     )
+
+    # Plotly 차트 렌더링
     st.plotly_chart(fig_scatter)
 
     # 일간 변동성 히스토그램
