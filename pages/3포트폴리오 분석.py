@@ -173,7 +173,7 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
                              color_discrete_sequence=px.colors.qualitative.Set1)
     
     # 마커 스타일 업데이트
-    fig_scatter.update_traces(marker=dict(size=15))
+    fig_scatter.update_traces(marker=dict(size=30))
     
     # 범례 위치 및 제목 업데이트
     fig_scatter.update_layout(
