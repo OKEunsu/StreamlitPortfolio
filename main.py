@@ -84,7 +84,7 @@ with st.form(key="form"):
             valid_input = False
 
         try:
-            stock_price = float(stock_current)
+            stock_current = float(stock_current)
         except ValueError:
             st.error("현재가는 숫자여야 합니다.")
             valid_input = False
