@@ -1,1 +1,10 @@
+[theme]
+primaryColor = "#4CAF50"
+
+[server]
+headless = true
+
+[menuItems]
+showGetHelp = false
+showReportBug = false
 
