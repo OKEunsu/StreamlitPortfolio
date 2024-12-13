@@ -1,6 +1,14 @@
 import streamlit as st
 import yfinance as yf
 
+hide_menu = """
+<style>
+#MainMenu {
+    visibility:hidden
+}
+
+</style>
+"""
 
 
 # Function to delete a stock from the list
