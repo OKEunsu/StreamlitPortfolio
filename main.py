@@ -10,6 +10,10 @@ header {visibility: hidden;}
 [data-testid="appCreatorAvatar"] {
     display: none;
 }
+
+._profileContainer_gzau3_53 {
+    display: none;
+}
 </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
