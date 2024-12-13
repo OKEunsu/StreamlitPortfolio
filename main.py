@@ -1,14 +1,15 @@
 import streamlit as st
 import yfinance as yf
 
-hide_menu = """
+# CSS 삽입
+hide_streamlit_style = """
 <style>
-#MainMenu {
-    visibility:hidden
-}
-
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
 </style>
 """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
 # Function to delete a stock from the list
