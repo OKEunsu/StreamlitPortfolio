@@ -1,5 +1,6 @@
 [theme]
 primaryColor = "#4CAF50"
+hide_menu_items = "._profileContainer_gzau3_53"
 
 [server]
 headless = true
@@ -7,4 +8,3 @@ headless = true
 [menuItems]
 showGetHelp = false
 showReportBug = false
-
