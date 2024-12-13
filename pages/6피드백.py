@@ -49,7 +49,7 @@ with st.form("my_form"):
                     }
                 },
                 '별점': {  # 별점 속성 (숫자)
-                    'number': int(selected) + 1  # 사용자가 선택한 별점
+                    'number': int(selected)  # 사용자가 선택한 별점
                 },
                 '텍스트': {  # 텍스트 속성
                     'rich_text': [
