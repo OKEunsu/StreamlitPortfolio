@@ -5,6 +5,7 @@ from collections import defaultdict
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import json
 
 def get_ticker_short_name(ticker_symbol):
     ticker = yf.Ticker(ticker_symbol)
@@ -37,14 +38,23 @@ def format_value(value):
 def get_info_sector(tickers):
     sectors = []
     for ticker in tickers:
-        ticker_obj = yf.Ticker(ticker)
-        info = ticker_obj.info
-        if 'sector' in info:
-            sectors.append(info['sector'])
-        elif info['quoteType'] == 'ETF':
-            sectors.append('ETF')
-        else:
-            sectors.append('Unknown')  # 섹터 정보가 없을 경우
+        try:
+            ticker_obj = yf.Ticker(ticker)
+            info = ticker_obj.info
+
+            if 'sector' in info:
+                sectors.append(info['sector'])
+            elif info.get('quoteType') == 'ETF':
+                sectors.append('ETF')
+            else:
+                sectors.append('Unknown')
+
+        except (KeyError, json.decoder.JSONDecodeError, ValueError):
+            sectors.append('Unknown')
+        except Exception as e:
+            # 예외 로그 출력 (Streamlit에 표시 가능)
+            st.warning(f"{ticker} 정보를 가져오지 못했습니다: {e}")
+            sectors.append('Unknown')
     return sectors
 
 
