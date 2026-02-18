@@ -2,6 +2,9 @@ import streamlit as st
 import datetime
 import requests
 import json
+from ui_theme import apply_theme
+
+apply_theme("리뷰")
 
 # 환경 변수에서 API 키와 데이터베이스 ID 가져오기
 api_key = st.secrets["api_key"]

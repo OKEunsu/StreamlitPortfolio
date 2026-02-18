@@ -3,6 +3,9 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from ui_theme import apply_theme
+
+apply_theme("포트폴리오 평가")
 
 def get_ticker_short_name(ticker_symbol):
     ticker = yf.Ticker(ticker_symbol)
@@ -154,12 +157,12 @@ def sharp_ratio(data, stocks, having_qty, stock_prices, krw_usd_rate):
     st.write("Your Portfolio")
     port_df = pd.DataFrame([[hav_ret, hav_risk, hav_sharpe] + hav_weights], columns = ['Returns', 'Risk', 'Sharpe'] + stocks)
 
-    st.dataframe(port_df, use_container_width = True, hide_index=True)
+    st.dataframe(port_df, width='stretch', hide_index=True)
     st.session_state.port_df = port_df
     st.write("Max Sharp Ratio")
-    st.dataframe(round(max_sharpe, 4), use_container_width=True, hide_index=True)
+    st.dataframe(round(max_sharpe, 4), width='stretch', hide_index=True)
     st.write("Min Risk")
-    st.dataframe(round(min_risk, 4), use_container_width=True, hide_index=True)
+    st.dataframe(round(min_risk, 4), width='stretch', hide_index=True)
 
     # 최소-변동성과 평균-변동성 포트폴리오 시각화
     fig = go.Figure()
@@ -297,7 +300,7 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
         yaxis_title='Values'
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     dataList = [p1, p2, p3, p4]
     tabList = ['Your Portfolio', 'Max Sharpe Ratio', 'Min Risk Ratio', 'Simulation']
@@ -307,7 +310,7 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
         with tab:
             dataframe = dataList[i]
             fig_mdd, mdd = mdd_stock(dataframe)
-            st.plotly_chart(fig_mdd)
+            st.plotly_chart(fig_mdd, key=f"mdd_chart_{i}")
             date_diff = round((dataframe.index[-1] - dataframe.index[0]).days / 365.25, 2)
             start_asset = float(dataframe.loc[dataframe.index[0], 'TotalValue'])
             end_asset = float(dataframe.loc[dataframe.index[-1], 'TotalValue'])

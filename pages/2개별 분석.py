@@ -3,6 +3,9 @@ import yfinance as yf
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
+from ui_theme import apply_theme
+
+apply_theme("개별 분석")
 
 
 # 티커 이름 변환
@@ -288,11 +291,11 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
             dtype = info.get('quoteType')
 
             fig_ohlc = ohlc_plot(df, stock_name, stock_price)
-            st.plotly_chart(fig_ohlc)
+            st.plotly_chart(fig_ohlc, key=f"ohlc_chart_{i}")
 
             # DD & MDD
             fig_mdd = mdd_stock(df, stock_name)
-            st.plotly_chart(fig_mdd)
+            st.plotly_chart(fig_mdd, key=f"mdd_stock_chart_{i}")
 
             financial_metrics = get_financial_metrics(stock_name)
 
@@ -312,11 +315,12 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
                 fig_fundamental, fig_eps = get_fundamental_data(stock_name)
                 fig_recommend = get_recommend(stock_name)
                 fig_ratio = get_ratio(stock_name)
-                st.plotly_chart(fig_fundamental)
-                st.plotly_chart(fig_eps)
+                st.plotly_chart(fig_fundamental, key=f"fundamental_chart_{i}")
+                if fig_eps is not None:
+                    st.plotly_chart(fig_eps, key=f"eps_chart_{i}")
                 if fig_ratio is not None:
-                    st.plotly_chart(fig_ratio)
-                st.plotly_chart(fig_recommend)
+                    st.plotly_chart(fig_ratio, key=f"ratio_chart_{i}")
+                st.plotly_chart(fig_recommend, key=f"recommend_chart_{i}")
 
             elif dtype == 'ETF' and not (stock_name.endswith('.KS') or stock_name.endswith('.KQ')):
                 col1, col2, col3, col4 = st.columns(4)

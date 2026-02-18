@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
+from ui_theme import apply_theme
+
+apply_theme("포트폴리오 분석")
 
 
 # 티커 영문명

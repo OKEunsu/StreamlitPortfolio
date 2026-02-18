@@ -6,6 +6,9 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import json
+from ui_theme import apply_theme
+
+apply_theme("포트폴리오 요약")
 
 def get_ticker_short_name(ticker_symbol):
     ticker = yf.Ticker(ticker_symbol)
@@ -183,11 +186,11 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
         values.append(total_value)
 
     fig_pie = ploty_pie_portfolio(labels_name, values)
-    st.plotly_chart(fig_pie, use_container_width=True)
+    st.plotly_chart(fig_pie, width='stretch')
 
     fig_sector, fig_tree = ploty_sector(labels, values)
-    st.plotly_chart(fig_sector, use_container_width=True)
-    st.plotly_chart(fig_tree, use_container_width=True)
+    st.plotly_chart(fig_sector, width='stretch')
+    st.plotly_chart(fig_tree, width='stretch')
 
 else:
     st.write("포트폴리오에 주식이 없습니다.")

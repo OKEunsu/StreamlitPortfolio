@@ -3,6 +3,9 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 import plotly.express as px
+from ui_theme import apply_theme
+
+apply_theme("포트폴리오 상관관계 분석")
 
 # 티커 영문명 가져오기
 def get_ticker_short_name(ticker_symbol):
@@ -60,6 +63,7 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
 
     labels = [stock['stock_name'] for stock in st.session_state.stock_list]
     short_names = [get_ticker_short_name(ticker) for ticker in labels]
+    matrix_height = max(320, min(720, 130 * len(short_names) + 120))
     df = stock_df(labels, get_krw_usd())
 
     # 상관계수 데이터프레임 생성
@@ -87,7 +91,8 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
         yaxis_title='Stocks',
         xaxis=dict(tickmode='array', tickvals=list(range(len(short_names))), ticktext=short_names),
         yaxis=dict(tickmode='array', tickvals=list(range(len(short_names))), ticktext=short_names),
-        font=dict(size=16)
+        font=dict(size=16),
+        height=matrix_height
     )
     st.plotly_chart(fig)
 
@@ -114,7 +119,8 @@ if "stock_list" in st.session_state and st.session_state.stock_list:
         yaxis_title='Stocks',
         xaxis=dict(tickmode='array', tickvals=list(range(len(short_names))), ticktext=short_names),
         yaxis=dict(tickmode='array', tickvals=list(range(len(short_names))), ticktext=short_names),
-        font=dict(size=16)
+        font=dict(size=16),
+        height=matrix_height
     )
     st.plotly_chart(fig_return)
 
